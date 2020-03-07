@@ -1,0 +1,80 @@
+openapi: '3.0.0'
+info:
+  version: 1.0.0
+  title: Instability API
+  license:
+    name: MIT
+  description: |
+    API for testing microservices that returns 5xx errors randomly.<br>
+    try it at https://instability.now.sh/
+servers:
+  - url: https://instability.now.sh/
+    description: endopoint
+paths:
+  /:
+    get:
+      summary: Returns an unstable response
+      operationId: unstable get
+      tags:
+        - Unstable API
+      parameters:
+        - name: errorRate
+          in: query
+          description: Probability of 5xx error
+          required: false
+          schema:
+            type: integer
+            format: int32
+          example:
+            errorRate: 40
+      responses:
+        '200':
+          description: status code and messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unstable'
+    post:
+      summary: Returns an unstable response
+      operationId: unstable post
+      tags:
+        - Unstable API
+      requestBody:
+        description: Optional description in *Markdown*
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                errorRate:
+                  type: integer
+                  format: int64
+            example:
+              errorRate: 30
+      responses:
+        '200':
+          description: status code and messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unstable'
+              example:
+                status: 500
+                message: 'Internal Server Error'
+components:
+  schemas:
+    Unstable:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: integer
+          format: int64
+        message:
+          type: string
+      example:
+        status: 504
+        message: 'Gateway Timeout'
