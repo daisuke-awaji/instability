@@ -1,0 +1,14 @@
+import { Controller, Get, Res } from '@nestjs/common';
+import { Response } from 'express';
+import { AppService } from './app.service';
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+  @Get()
+  async getRandom(@Res() res: Response) {
+    const result = await this.appService.getRandom();
+    res.status(result.status).send(result);
+  }
+}
