@@ -1,0 +1,41 @@
+version: 2.1
+defaults: &defaults
+  working_directory: ~/repo
+  docker:
+    - image: circleci/node:11.12
+
+commands:
+  prepare:
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
+      - run: npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+jobs:
+  now:
+    <<: *defaults
+    steps:
+      - prepare
+      - run:
+          name: install now
+          command: sudo npm install -g --unsafe-perm now
+      - run:
+          name: deploy
+          command: |
+            now -t ${ZEIT_TOKEN}
+            now alias pavlog -t ${ZEIT_TOKEN}
+
+workflows:
+  deploy:
+    jobs:
+      - now:
+          filters:
+            branches:
+              only: master
