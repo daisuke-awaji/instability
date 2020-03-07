@@ -5,24 +5,25 @@ defaults: &defaults
     - image: circleci/node:11.12
 
 commands:
-  prepare:
+  build:
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
             - v1-dependencies-
-      - run: npm install
+      - run: yarn install
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
+      - run: yarn build
 
 jobs:
   now:
     <<: *defaults
     steps:
-      - prepare
+      - build
       - run:
           name: install now
           command: sudo npm install -g --unsafe-perm now
